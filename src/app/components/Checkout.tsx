@@ -15,15 +15,17 @@ const App = () => {
       <Formik>
         <Form>
         <label htmlFor="valordopagamento"></label>
-        <Field id="firstName" name="firstName" placeholder="Valor do pagamento" />
-        <label htmlFor="firstName"></label>
-          <Field id="firstName" name="firstName" placeholder="Numero do cartão" />
-          <label htmlFor="firstName"></label>
-          <Field id="firstName" name="firstName" placeholder="Mês de expiração(MM)" />
-          <label htmlFor="firstName"></label>
-          <Field id="firstName" name="firstName" placeholder="Ano de expiração(YYYY)" />
-          <label htmlFor="lastName"></label>
-          <Field id="lastName" name="lastName" placeholder="CVV" />
+        <Field id="valordopagamento" name="valordopagamento" placeholder="Valor do pagamento" />
+        <label htmlFor="numerodocartao"></label>
+          <Field id="numerodocartao" name="numerodocartao" placeholder="Numero do cartão" />
+          <label htmlFor="nomedotitular"></label>
+          <Field id="nomedotitular" name="nomedotitular" placeholder="Nome do titular" />
+          <label htmlFor="mesdexpiracao"></label>
+          <Field id="mesdexpiracao" name="mesdexpiracao" placeholder="Mês de expiração(MM)" />
+          <label htmlFor="anodexpiracao"></label>
+          <Field id="anodexpiracao" name="anodexpiracao" placeholder="Ano de expiração(YYYY)" />
+          <label htmlFor="cvv"></label>
+          <Field id="cvv" name="cvv" placeholder="CVV" />
         </Form>
     </Formik>
     <button
