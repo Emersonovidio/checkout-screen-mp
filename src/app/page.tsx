@@ -1,8 +1,12 @@
+"use cliente";
+import Checkout from './components/Checkout';
 
-export default function Home() {
+
+const Home = () => {
+
   return (
-      <div>
-        <h1>Payment Screen</h1>
-      </div>
+      <Checkout />
   );
-}
+};
+
+export default Home;
