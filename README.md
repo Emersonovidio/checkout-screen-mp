@@ -58,7 +58,13 @@ $ npm run dev
 - Nextjs 
 
 
-```
+
+## - Tela de pagamento
+
+![alt text](https://github.com/Emersonovidio/desafio-jaya-tech-frontend/blob/main/public/tela-pagamento.png)
+
+
+
 
 
 
