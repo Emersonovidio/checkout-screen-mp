@@ -5,7 +5,9 @@ import * as ReactDOM from 'react-dom';
 import { Context } from "./ContextProvider";
 import { Formik, Field, Form, FormikHelpers } from 'formik';
 import ParcelasModal from './Installments';
-import { initMercadoPago } from '@mercadopago/sdk-react'
+import { initMercadoPago,
+  createCardToken
+} from '@mercadopago/sdk-react'
 
 
 initMercadoPago('TEST-c6599800-5081-4af0-ab8b-7fb3e8066bb0');
@@ -13,6 +15,26 @@ const App = () => {
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedParcelas, setSelectedParcelas] = useState(1);
+  const [cardToken, setCardToken] = useState(null);
+
+  const handleSubmit = async (values) => {
+    try {
+      const { data } = await createCardToken(
+        {
+          cardNumber: values.numerodocartao,
+            securityCode: values.cvv,
+            cardExpirationMonth: values.mesdexpiracao,
+            cardExpirationYear: values.anodexpiracao,
+            cardholderName: values.nomedotitular,
+            docType: 'CPF',
+            docNumber: values.cpf
+        });
+        setCardToken(data.id);
+    } catch (error) {
+      console.log('erro na criacao do token:', error);
+      
+    }
+  }
 
   const openModal = () => {
     setModalIsOpen(true);
