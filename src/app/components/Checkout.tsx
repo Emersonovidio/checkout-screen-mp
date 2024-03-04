@@ -11,49 +11,90 @@ import { initMercadoPago,
 
 
 initMercadoPago('TEST-c6599800-5081-4af0-ab8b-7fb3e8066bb0');
+
 const App = () => {
 
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [selectedParcelas, setSelectedParcelas] = useState(1);
-  const [cardToken, setCardToken] = useState(null);
 
-  const handleSubmit = async (values) => {
+  const createNewToken = async (values) => {
     try {
-      const { data } = await createCardToken(
-        {
-          cardNumber: values.numerodocartao,
-            securityCode: values.cvv,
-            cardExpirationMonth: values.mesdexpiracao,
-            cardExpirationYear: values.anodexpiracao,
-            cardholderName: values.nomedotitular,
-            docType: 'CPF',
-            docNumber: values.cpf
-        });
-        setCardToken(data.id);
-    } catch (error) {
-      console.log('erro na criacao do token:', error);
+      const cardToken = await createCardToken({
+        cardNumber: values.numerodocartao,
+        cardholderName: values.nomedotitular,
+        cardExpirationMonth: values.mesdexpiracao,
+        cardExpirationYear: values.anodexpiracao,
+        securityCode: values.cvv,
+        identificationType: "CPF",
+        identificationNumber: values.numerodeidentificacao,
+      });      
       
+      console.log('Token criado com sucesso',cardToken);
+      return cardToken;
+      
+    } catch (error) {
+      console.log('erro ao criar token:', error);
     }
-  }
+};
 
-  const openModal = () => {
-    setModalIsOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalIsOpen(false);
-  };
-
-  const handleSelectParcelas = (parcelas) => {
-    setSelectedParcelas(parcelas);
-    closeModal();
-  };
+    const newPayment = async () => {
+      try {
+        const payment =   await fetch('http://localhost:8000/api/payments', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Access-Control-Allow-Origin': 'http://localhost:3000/'
+          },
+          body: JSON.stringify({
+            transaction_amount: values.valordopagamento,
+            installments: values.numerodeparcelas,
+            token: cardToken,
+            payment_method_id: values.paymentMethodId,
+            payer: {
+              payer_email: values.emaildopagador,
+              payer_identification_type: "CPF",
+              payer_identification_number: values.numerodeidentificacao
+            }
+          })
+        })
+  
+        console.log('pagamento criado com sucesso');
+        
+      } catch (error) {
+        throw new Error("erro ao criar um pagamento"); 
+      }
+    };
     
+    const handleSubmit = async (values) => {
+      
+    try {
+      const cardToken = await createNewToken(values);
+
+      await newPayment(values, cardToken);
+      
+      console.log('Novo Pagamento finalizado');
+    } catch (error) {
+      console.error("Pagamento não finalizado:", error);
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', marginTop: 250, marginRight: 500, marginLeft: 100 }}>
       <div style={{ flex: 1, marginRight: 10 }}>
       <h1 style={{ fontWeight: 'bold' }}>Dados do Pagador</h1>
-      <Formik>
+      <Formik
+        initialValues={{ 
+          emaildopagador: '',
+          numerodeidentificacao: null,
+          tipododocumento: 'CPF',
+          valordopagamento: null,
+          numerodocartao: null,
+          nomedotitular: '',
+          mesdexpiracao: null,
+          anodexpiracao: null,
+          cvv: null,
+          numerodeparcelas: 1
+          }}
+        onSubmit={handleSubmit}
+      >
         <Form>
         <div style={{ marginBottom: 10, marginTop: 20 }}>
         <label htmlFor="emaildopagador"></label>
@@ -84,7 +125,8 @@ const App = () => {
     </div>
     <div style={{ flex: 1 }}>
     <h1 style={{ fontWeight: 'bold' }}>Dados do Pagamento</h1>
-    <Formik>
+    <Formik
+    >     
         <Form>
         <div style={{ marginBottom: 10, marginTop: 20 }}>
         <label htmlFor="valordopagamento"></label>
@@ -142,10 +184,11 @@ const App = () => {
           </div>
           <div style={{ marginBottom: 10, marginTop: 20 }}>
           <label htmlFor="numerodeparcelas">Selecione o número de parcelas</label>
-          <Field as="select" id="numerodeparcelas" name="numerodeparcelas" style={{ border: '1px solid #ccc', borderRadius: '4px', padding: '8px', width: '100%' }}>
-            <option value="1">1 parcela</option>
-            <option value="2">2 parcelas</option>
-            <option value="3">3 parcelas</option>
+          <Field 
+           id="numerodeparcelas" 
+           name="numerodeparcelas" 
+           placeholder="numerodeparcelas" 
+           style={{ border: '1px solid #ccc', borderRadius: '4px', padding: '8px', width: '100%' }}>
           </Field>
         </div>
         </Form>
